@@ -38,7 +38,7 @@ def init_db():
             # Check and fix customer table columns
             db.execute("SELECT column_name FROM information_schema.columns WHERE table_name='customer'")
             existing_cols = [row[0] for row in db.fetchall()]
-            print(f"📋 Existing columns: {existing_cols}")
+            print(f" Existing columns: {existing_cols}")
             
             # Create table if not exists with all required columns
             db.execute('''
@@ -59,16 +59,16 @@ def init_db():
             # Add missing columns one by one
             if 'password' not in existing_cols:
                 db.execute("ALTER TABLE customer ADD COLUMN password VARCHAR(255) NOT NULL DEFAULT 'temp'")
-                print("✅ Added 'password' column")
+                print(" Added 'password' column")
             if 'address' not in existing_cols:
                 db.execute("ALTER TABLE customer ADD COLUMN address TEXT")
-                print("✅ Added 'address' column")
+                print(" Added 'address' column")
             if 'role' not in existing_cols:
                 db.execute("ALTER TABLE customer ADD COLUMN role VARCHAR(20) DEFAULT 'customer'")
-                print("✅ Added 'role' column")
+                print(" Added 'role' column")
             if 'created_at' not in existing_cols:
                 db.execute("ALTER TABLE customer ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-                print("✅ Added 'created_at' column")
+                print(" Added 'created_at' column")
             
             # Create other tables
             db.execute('''
@@ -91,9 +91,9 @@ def init_db():
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             ''')
-            print("✅ Database initialized successfully!")
+            print(" Database initialized successfully!")
     except Exception as e:
-        print(f"❌ DB Init Error: {str(e)}")
+        print(f" DB Init Error: {str(e)}")
         print(traceback.format_exc())
 
 # ============ AUTH ============
@@ -137,7 +137,7 @@ app = FastAPI(title="Ticket Management System")
 
 @app.on_event("startup")
 def startup():
-    print("🚀 Starting...")
+    print(" Starting...")
     init_db()
 
 @app.on_event("shutdown")
@@ -158,7 +158,7 @@ def health():
 # ============ AUTH ENDPOINTS ============
 @app.post("/register")
 def register(cust: Customer):
-    print(f"📝 Registering: {cust.email}")
+    print(f" Registering: {cust.email}")
     try:
         # Validate input
         if len(cust.password) < 6:
@@ -178,15 +178,15 @@ def register(cust: Customer):
                 VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING cust_id
             """, (cust.name, cust.email, hashed, cust.phone_no, cust.gender, cust.age, cust.address))
             cust_id = db.fetchone()[0]
-            print(f"✅ Registered: {cust.email} (ID: {cust_id})")
+            print(f" Registered: {cust.email} (ID: {cust_id})")
             return {"message": "Registered successfully", "customer_id": cust_id}
     except HTTPException:
         raise
     except psycopg2.IntegrityError as e:
-        print(f"❌ Integrity Error: {str(e)}")
+        print(f" Integrity Error: {str(e)}")
         raise HTTPException(400, "Email already registered or data integrity issue")
     except Exception as e:
-        print(f"❌ Register Error: {str(e)}")
+        print(f" Register Error: {str(e)}")
         print(traceback.format_exc())
         raise HTTPException(400, f"Registration failed: {str(e)}")
 
