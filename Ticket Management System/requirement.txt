@@ -5,3 +5,4 @@ uvicorn
 PyJWT
 passlib[bcrypt]
 python-multipart
+email-validator
